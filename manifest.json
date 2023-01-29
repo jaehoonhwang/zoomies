@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Zoomies",
+  "version": "1.0",
+  "description": "Set zoom per profiles",
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "js": ["scripts/content.js"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
