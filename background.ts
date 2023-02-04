@@ -21,6 +21,16 @@ async function main() {
       })
     }
   );
+
+  // TODO(jaehoonh): Seems like chrome.tabs.getAllInWindow can be used.
+  // chrome.tabs.getAllInWIndow();
+
+  // https://developer.chrome.com/docs/extensions/reference/system_display/#event-onDisplayChanged
+  chrome.system.display.onDisplayChanged.addListener(
+    () => {
+
+    }
+  )
 }
 
 main();

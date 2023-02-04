@@ -5,7 +5,8 @@
   "description": "Set zoom per profiles",
   "permissions": [
     "tabs",
-    "storage"
+    "storage",
+    "system.display"
   ],
   "background": {
     "service_worker": "background.js"
