@@ -1,3 +1,5 @@
+const CONFIG = "config";
+
 export interface Zoomie {
   zoomLevel: number;
   matchingUrl: string;
@@ -5,46 +7,47 @@ export interface Zoomie {
   rawUrl?: string;
 }
 
+export interface ZoomieConfig {
+  currentProfile: string;
+  profiles: string[];
+
+  [key: string]: string | string[];
+}
+
 export interface ZoomieStorage {
   storage: chrome.storage.StorageArea;
 
-  upsave: (profile: string, rawUrl: string, zoomLevel: number) => void;
-  load: (profile: string, rawUrl: string) => Zoomie;
+  upsave: (profile: string, rawUrl: string, zoomLevel: number) => Promise<void>;
+  load: (profile: string, rawUrl: string) => Promise<Zoomie>;
+
+  configUpsave: (key: string | null, value: string | null) => Promise<void>;
+  configLoad: () => Promise<ZoomieConfig>;
 }
 
-class ZoomieStorageConstants {
-  public static readonly depth = 2;
+export interface ZoomieConfigStorage {
+  storage: chrome.storage.StorageArea;
+
+  upsave: (key: string, value: string) => Promise<void>;
+  load: (key: string) => Promise<Zoomie>;
 }
+
+const defaultConfig: ZoomieConfig = {
+  currentProfile: "default",
+  profiles: ["default"],
+};
+
 
 export class ZoomieConverter {
-  public static readonly keyDelimiter: string = "|";
-  public static readonly pathDelimiter: string = "/";
+  public static readonly storageDelimieter: string = "#";
 
-  /*
-   * Zoomie keys are constructed: profile.rawUrl
-   * It will try to get all possible Urls for key.
-   * Example:
-   *  profile: default & rawUrl: https://example.com/example2/index.html
-   *  then it will return
-   *    [
-   *      example.com/example2/index.html,
-   *      example.com/example2,
-   *      example.com,
-   *    ]
-   */
-  public static getZoomieKey(rawUrl: string): string[] {
-    let url: URL = new URL(rawUrl);
-    let paths: string[] = url.pathname.split(this.pathDelimiter);
-    let possibleKeys: string[] = [url.hostname];
-    let pathnameHolder: string = url.hostname;
+  public static getZoomieKey(rawUrl: string): string {
+    const url: URL = new URL(rawUrl);
 
-    for (let path in paths) {
-      pathnameHolder += this.pathDelimiter + path;
-      possibleKeys.push(pathnameHolder);
-    }
+    return url.hostname + url.pathname;
+  }
 
-    possibleKeys.push(rawUrl);
-    return possibleKeys.reverse();
+  public static getStorageKey(profile: string, url: string): string {
+    return profile + this.storageDelimieter + url;
   }
 }
 
@@ -55,47 +58,47 @@ export class ZoomieLocalStorage implements ZoomieStorage {
     this.storage = chrome.storage.local;
   }
 
-  public upsave(profile: string, rawUrl: string, zoomLevel: number): void {
-    let possibleKeys: string[] = ZoomieConverter.getZoomieKey(rawUrl);
-    let saveKeys: string[] = possibleKeys.length < ZoomieStorageConstants.depth
-      ? possibleKeys : possibleKeys.slice(0, ZoomieStorageConstants.depth);
-    for (let key in saveKeys) {
-      this.storage.get([key]).then(
-        (result) => {
-          if (result == undefined) {
-            result = {
-              profile: zoomLevel,
-            }
-          } else if (!result.hasOwnProperty(profile)) {
-            result[profile] = zoomLevel;
-          }
-          this.storage.set({ key: result });
-        });
-    }
+  public async upsave(profile: string, rawUrl: string, zoomLevel: number): Promise<void> {
+    const possibleKey: string = ZoomieConverter.getZoomieKey(rawUrl);
+    const storageKey: string = ZoomieConverter.getStorageKey(profile, possibleKey);
 
-    let storageGetPromises: any = [];
-    for (let key in possibleKeys) {
-      storageGetPromises.push(this.storage.get([key]).then(
-        (results) => {
-          return { key: key, results: results, }
-        }
-      ));
-    }
-
-    Promise.all(storageGetPromises).then(
-      (zoomInfoLite) => {
-
-        return;
-      });
+    await this.storage.set(
+      {
+        [storageKey]: zoomLevel,
+      }
+    );
   }
 
-  public load(profile: string, rawUrl: string): Zoomie {
-    let possibleKeys: string[] = ZoomieConverter.getZoomieKey(rawUrl);
-    for (let key in possibleKeys) {
-      this.storage.get([key]).then(
-        (result) => {
-        });
+  public async load(profile: string, rawUrl: string): Promise<Zoomie> {
+    const possibleKey: string = ZoomieConverter.getZoomieKey(rawUrl);
+    const storageKey: string = ZoomieConverter.getStorageKey(profile, possibleKey);
+
+    const result = await this.storage.get([storageKey]);
+    const zoomLevel: number = result[storageKey];
+    const zoomie: Zoomie = {
+      zoomLevel: zoomLevel,
+      matchingUrl: possibleKey,
+    };
+
+    console.log("LOAD", zoomie);
+    return zoomie;
+  }
+
+  public async configLoad(): Promise<ZoomieConfig> {
+    const result = await this.storage.get([CONFIG]);
+    return result[CONFIG];
+  }
+
+  public async configUpsave(key: string | null, value: string | null): Promise<void> {
+    let config: ZoomieConfig = await this.configLoad();
+    if (config === undefined) {
+      config = defaultConfig;
     }
-    return { zoomLevel: 1, profile: "default", matchingUrl: "dank" };
+
+    if (key != undefined && value != undefined) {
+      config[key] = value;
+    }
+
+    this.storage.set({ [CONFIG]: config });
   }
 }
