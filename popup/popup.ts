@@ -1,4 +1,5 @@
-import { ZoomieLocalStorage, ZoomieStorage, ZoomieConfig } from "../storage";
+import { ZoomieLocalStorage, ZoomieStorage, ZoomieStorageRequest } from "../storage";
+import { ZoomieConfig } from "../config";
 
 function queryAllTabs(): Promise<chrome.tabs.Tab[]> {
   return chrome.tabs.query({});
@@ -14,7 +15,18 @@ async function main() {
       for (const tab of tabs) {
         if (tab.id && tab.url != undefined) {
           chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
-            storage.upsave(config.currentProfile, tab.url!, zoomFactor);
+            chrome.windows.get(tab.windowId, (displayInfo) => {
+              const request: ZoomieStorageRequest = {
+                zoomLevel: zoomFactor,
+                rawUrl: tab.url!,
+                display: {
+                  width: displayInfo.width,
+                  height: displayInfo.height,
+                  windowType: displayInfo.type,
+                }
+              };
+              storage.upsave(request);
+            });
           });
         }
       }
@@ -25,21 +37,43 @@ async function main() {
     queryAllTabs().then((tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url !== undefined) {
-          const Zoomies = storage.load(config.currentProfile, tab.url!);
-          for (const zoomie in Zoomies) {
-            console.log(zoomie);
-          }
+          chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
+            chrome.windows.get(tab.windowId, (displayInfo) => {
+              const request: ZoomieStorageRequest = {
+                zoomLevel: zoomFactor,
+                rawUrl: tab.url!,
+                display: {
+                  width: displayInfo.width,
+                  height: displayInfo.height,
+                  windowType: displayInfo.type,
+                }
+              };
+              storage.load(request);
+            });
+          });
         }
       }
-    });
+    })
   };
 
   const syncClickCallback = () => {
     queryAllTabs().then((tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url !== undefined) {
-          storage.load(config.currentProfile, tab.url!)
-            .then((zoomie) => chrome.tabs.setZoom(tab.id!, zoomie.zoomLevel));
+          chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
+            chrome.windows.get(tab.windowId, (displayInfo) => {
+              const request: ZoomieStorageRequest = {
+                zoomLevel: zoomFactor,
+                rawUrl: tab.url!,
+                display: {
+                  width: displayInfo.width,
+                  height: displayInfo.height,
+                  windowType: displayInfo.type,
+                }
+              };
+              storage.load(request);
+            });
+          });
         }
       }
     });

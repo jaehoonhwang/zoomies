@@ -1,53 +1,60 @@
+import { ZoomieConfig, defaultConfig } from './config';
+
 const CONFIG = "config";
 
 export interface Zoomie {
   zoomLevel: number;
   matchingUrl: string;
-  profile?: string;
-  rawUrl?: string;
 }
 
-export interface ZoomieConfig {
-  currentProfile: string;
-  profiles: string[];
+export interface ZoomieDisplay {
+  height?: number;
+  width?: number;
+  windowType?: chrome.windows.windowTypeEnum;
+}
 
-  [key: string]: string | string[];
+export interface ZoomieStorageRequest {
+  display: ZoomieDisplay;
+  zoomLevel: number;
+  rawUrl: string;
+  profileName?: string;
 }
 
 export interface ZoomieStorage {
   storage: chrome.storage.StorageArea;
 
-  upsave: (profile: string, rawUrl: string, zoomLevel: number) => Promise<void>;
-  load: (profile: string, rawUrl: string) => Promise<Zoomie>;
+  upsave: (request: ZoomieStorageRequest) => Promise<void>;
+  load: (request: ZoomieStorageRequest) => Promise<Zoomie>;
 
   configUpsave: (key: string | null, value: string | null) => Promise<void>;
   configLoad: () => Promise<ZoomieConfig>;
 }
 
-export interface ZoomieConfigStorage {
-  storage: chrome.storage.StorageArea;
-
-  upsave: (key: string, value: string) => Promise<void>;
-  load: (key: string) => Promise<Zoomie>;
-}
-
-const defaultConfig: ZoomieConfig = {
-  currentProfile: "default",
-  profiles: ["default"],
-};
-
-
 export class ZoomieConverter {
   public static readonly storageDelimieter: string = "#";
+  public static readonly displayDelimiter: string = "x";
+  public static readonly displayTypeDelimieter: string = ".";
 
-  public static getZoomieKey(rawUrl: string): string {
-    const url: URL = new URL(rawUrl);
+  public static getZoomieKey(urlString: string): string {
+    const url: URL = new URL(urlString);
 
     return url.hostname + url.pathname;
   }
 
-  public static getStorageKey(profile: string, url: string): string {
-    return profile + this.storageDelimieter + url;
+  public static getStorageKey(display: string, url: string): string {
+    return display + this.storageDelimieter + url;
+  }
+
+  public static getDisplayKey(display: ZoomieDisplay): string {
+    if (display.height === undefined || display.width === undefined) {
+      return "";
+    }
+    const displayKey: string = display.height + this.displayDelimiter + display.width;
+    if (display.windowType === undefined) {
+      return displayKey
+    }
+
+    return displayKey + this.displayTypeDelimieter + display.windowType;
   }
 }
 
@@ -58,23 +65,30 @@ export class ZoomieLocalStorage implements ZoomieStorage {
     this.storage = chrome.storage.local;
   }
 
-  public async upsave(profile: string, rawUrl: string, zoomLevel: number): Promise<void> {
-    const possibleKey: string = ZoomieConverter.getZoomieKey(rawUrl);
-    const storageKey: string = ZoomieConverter.getStorageKey(profile, possibleKey);
+  public async upsave(request: ZoomieStorageRequest): Promise<void> {
+    const possibleKey: string = ZoomieConverter.getZoomieKey(request.rawUrl);
+    const displayKey: string = ZoomieConverter.getDisplayKey(request.display);
+    const storageKey: string = ZoomieConverter.getStorageKey(displayKey, possibleKey);
 
     await this.storage.set(
       {
-        [storageKey]: zoomLevel,
+        [storageKey]: {
+          [displayKey]: {
+            zoomLevel: request.zoomLevel,
+          }
+        }
       }
     );
   }
 
-  public async load(profile: string, rawUrl: string): Promise<Zoomie> {
-    const possibleKey: string = ZoomieConverter.getZoomieKey(rawUrl);
-    const storageKey: string = ZoomieConverter.getStorageKey(profile, possibleKey);
+  public async load(request: ZoomieStorageRequest): Promise<Zoomie> {
+    const possibleKey: string = ZoomieConverter.getZoomieKey(request.rawUrl);
+    const displayKey: string = ZoomieConverter.getDisplayKey(request.display);
+    const storageKey: string = ZoomieConverter.getStorageKey(displayKey, possibleKey);
 
     const result = await this.storage.get([storageKey]);
-    const zoomLevel: number = result[storageKey];
+
+    const zoomLevel: number = result[storageKey][displayKey];
     const zoomie: Zoomie = {
       zoomLevel: zoomLevel,
       matchingUrl: possibleKey,
@@ -86,6 +100,8 @@ export class ZoomieLocalStorage implements ZoomieStorage {
 
   public async configLoad(): Promise<ZoomieConfig> {
     const result = await this.storage.get([CONFIG]);
+    console.log(result);
+    console.log(result[CONFIG]);
     return result[CONFIG];
   }
 

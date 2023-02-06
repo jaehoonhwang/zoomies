@@ -8,6 +8,7 @@ module.exports = {
     popup: path.resolve(__dirname, "..", "popup/popup.ts"),
     content: path.resolve(__dirname, "..", "scripts/content.ts"),
     storage: path.resolve(__dirname, "..", "storage.ts"),
+    config: path.resolve(__dirname, "..", "config.ts"),
   },
   output: {
     path: path.join(__dirname, "../dist"),
@@ -40,13 +41,15 @@ module.exports = {
       patterns: [{ from: ".", to: ".", context: "public" }]
     }),
     new CopyPlugin({
-      patterns: [{ from: ".", to: ".", context: "popup",
-      globOptions: {
-            ignore: [ // Ignore all `ts/js` files
-              "**/*.ts",
-              "**/*.js",
-            ],
-          },}]
+      patterns: [{
+        from: ".", to: ".", context: "popup",
+        globOptions: {
+          ignore: [ // Ignore all `ts/js` files
+            "**/*.ts",
+            "**/*.js",
+          ],
+        },
+      }]
     }),
   ],
 };

@@ -15,6 +15,12 @@ async function main() {
       const tabId = zoomChangeInfo.tabId;
 
       chrome.tabs.get(tabId, function(tab) {
+        const windowId: number =  tab.windowId;
+        chrome.windows.get(windowId, (window) => {
+          // window.
+        });
+
+
         if (tab.url !== undefined) {
           storage.upsave(config.currentProfile, tab.url, newZoomChange);
         }
