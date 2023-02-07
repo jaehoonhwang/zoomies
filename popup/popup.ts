@@ -18,6 +18,7 @@ async function main() {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
+                profileName: config.currentProfile.name,
                 rawUrl: tab.url!,
                 display: {
                   width: displayInfo.width,
@@ -41,6 +42,7 @@ async function main() {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
+                profileName: config.currentProfile.name,
                 rawUrl: tab.url!,
                 display: {
                   width: displayInfo.width,
@@ -64,6 +66,7 @@ async function main() {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
+                profileName: config.currentProfile.name,
                 rawUrl: tab.url!,
                 display: {
                   width: displayInfo.width,

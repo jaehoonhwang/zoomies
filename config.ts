@@ -51,13 +51,13 @@ export interface ZoomieProfile {
   description: string;
 }
 
-const defaultProfile: ZoomieProfile = {
+export const defaultProfile: ZoomieProfile = {
   name: "AmbiguousSloth",
   description: "Default one created when installed",
   displaySize: undefined,
 }
 
-const defaultConfig: ZoomieConfig = {
+export const defaultConfig: ZoomieConfig = {
   currentProfile: defaultProfile,
   profiles: [defaultProfile],
 };

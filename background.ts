@@ -1,42 +1,34 @@
-import { ZoomieLocalStorage, ZoomieConfig, ZoomieStorage } from './storage';
+import { ZoomieLocalStorage, ZoomieStorage, ZoomieStorageRequest } from './storage';
+import { defaultConfig } from './config';
 
 chrome.runtime.onInstalled.addListener(function() {
   const storage: ZoomieStorage = new ZoomieLocalStorage();
-  storage.configUpsave(null, null);
+  storage.configUpsave(defaultConfig);
 });
 
-async function main() {
-  const storage: ZoomieStorage = new ZoomieLocalStorage();
-  const config: ZoomieConfig = await storage.configLoad();
+chrome.tabs.onZoomChange.addListener(
+  async function(zoomChangeInfo) {
+    const newZoomChange = zoomChangeInfo.newZoomFactor;
+    const tabId = zoomChangeInfo.tabId;
+    const storage = new ZoomieLocalStorage();
 
-  chrome.tabs.onZoomChange.addListener(
-    (zoomChangeInfo) => {
-      const newZoomChange = zoomChangeInfo.newZoomFactor;
-      const tabId = zoomChangeInfo.tabId;
-
-      chrome.tabs.get(tabId, function(tab) {
-        const windowId: number =  tab.windowId;
-        chrome.windows.get(windowId, (window) => {
-          // window.
-        });
-
-
-        if (tab.url !== undefined) {
-          storage.upsave(config.currentProfile, tab.url, newZoomChange);
-        }
-      })
+    const config = await storage.configLoad();
+    const tab = await chrome.tabs.get(tabId);
+    if (tab === undefined) {
+      return;
     }
-  );
+    const window = await chrome.windows.get(tab.windowId);
 
-  // TODO(jaehoonh): Seems like chrome.tabs.getAllInWindow can be used.
-  // chrome.tabs.getAllInWIndow();
+    const request: ZoomieStorageRequest = {
+      zoomLevel: newZoomChange,
+      profileName: config.currentProfile.name,
+      rawUrl: tab.url!,
+      display: {
+        width: window.width,
+        height: window.height,
+        windowType: window.type,
+      }
+    };
 
-  // https://developer.chrome.com/docs/extensions/reference/system_display/#event-onDisplayChanged
-  chrome.system.display.onDisplayChanged.addListener(
-    () => {
-
-    }
-  )
-}
-
-main();
+    storage.upsave(request);
+  });
