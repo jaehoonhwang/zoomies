@@ -10,8 +10,14 @@ async function main() {
   const storage: ZoomieStorage = new ZoomieLocalStorage();
   const config: ZoomieConfig = await storage.configLoad();
 
+  const profile = document.querySelector("#current_profile");
+  if (profile !== null) {
+    profile.textContent = config.currentProfile.name;
+    // profile.nodeValue = config.currentProfile.name;
+  }
+
   const saveClickCallback = () => {
-    queryAllTabs().then((tabs) => {
+    queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url != undefined) {
           chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
@@ -35,7 +41,7 @@ async function main() {
   }
 
   const loadClickCallback = () => {
-    queryAllTabs().then((tabs) => {
+    queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url !== undefined) {
           chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
@@ -59,7 +65,7 @@ async function main() {
   };
 
   const syncClickCallback = () => {
-    queryAllTabs().then((tabs) => {
+    queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url !== undefined) {
           chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
@@ -94,6 +100,7 @@ async function main() {
   if (syncButton !== null) {
     syncButton.addEventListener('click', syncClickCallback);
   }
+
 }
 
 main();

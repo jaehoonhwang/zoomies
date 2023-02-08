@@ -8,12 +8,12 @@
   </head>
   <body>
     <h1>Zoomies</h1>
-    <h2>Current Profile: </h2><p class="current_profile"/>
+    <h2>Current Profile: </h2>
+    <!-- using <p .../> causes rest of to not render.-->
+    <p id="current_profile"></p>
     <button id="save_btn">Save</button>
     <button id="sync_zoom_btn">Zoom Sync</button>
     <button id="load_btn">Load</button>
-    <ul></ul>
-
     <script src="./popup.js" type="module"></script>
   </body>
 </html>
