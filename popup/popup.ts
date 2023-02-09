@@ -5,7 +5,6 @@ function queryAllTabs(): Promise<chrome.tabs.Tab[]> {
   return chrome.tabs.query({});
 }
 
-
 async function main() {
   const storage: ZoomieStorage = new ZoomieLocalStorage();
   const config: ZoomieConfig = await storage.configLoad();

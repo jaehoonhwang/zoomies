@@ -27,6 +27,17 @@ export interface ZoomieStorageRequest {
   profileName: string;
 }
 
+/**
+ * Storage should work like following:
+ * "www.example.com": {
+ *   "exampleProfileName": {
+ *     "1234x1234.popup": 1.5,
+ *   },
+ *   "exampleProfileName2": {
+ *     "1234x1234.popup": 2,
+ *   }
+ * }
+ */
 export interface ZoomieStorage {
   storage: chrome.storage.StorageArea;
 
@@ -46,10 +57,6 @@ export class ZoomieConverter {
     const url: URL = new URL(urlString);
 
     return url.hostname + url.pathname;
-  }
-
-  public static getStorageKey(display: string, url: string): string {
-    return display + this.storageDelimieter + url;
   }
 
   public static getDisplayKey(display: ZoomieDisplay): string {
@@ -75,32 +82,37 @@ export class ZoomieLocalStorage implements ZoomieStorage {
   public async upsave(request: ZoomieStorageRequest): Promise<void> {
     const possibleKey: string = ZoomieConverter.getZoomieKey(request.rawUrl);
     const displayKey: string = ZoomieConverter.getDisplayKey(request.display);
-    const storageKey: string = ZoomieConverter.getStorageKey(displayKey, possibleKey);
     const profileKey: string = request.profileName;
 
-    this.storage.get([profileKey], (zoomies) => {
-      if (zoomies[profileKey] == undefined) {
-        zoomies[profileKey] = {};
+    this.storage.get([possibleKey], (zoomies) => {
+
+      if (zoomies[possibleKey] === undefined) {
+        zoomies[possibleKey] = {};
       }
-      
-      zoomies[profileKey][storageKey] = request.zoomLevel;
-      this.storage.set({ [profileKey]: zoomies[profileKey] });
+
+      if (zoomies[possibleKey][profileKey] === undefined) {
+        zoomies[possibleKey][profileKey] = {};
+      }
+
+      zoomies[possibleKey][profileKey][displayKey] = request.zoomLevel;
+      this.storage.set({ [possibleKey]: zoomies[possibleKey] });
     });
   }
 
   public async load(request: ZoomieStorageRequest): Promise<Zoomie> {
     const possibleKey: string = ZoomieConverter.getZoomieKey(request.rawUrl);
     const displayKey: string = ZoomieConverter.getDisplayKey(request.display);
-    const storageKey: string = ZoomieConverter.getStorageKey(displayKey, possibleKey);
     const profileKey: string = request.profileName;
 
-    const result = await this.storage.get([profileKey]);
+    const result = await this.storage.get([possibleKey]);
 
-    if (result[profileKey][storageKey] === undefined) {
+    if (result[possibleKey] === undefined ||
+      result[possibleKey][profileKey] === undefined ||
+      result[possibleKey][profileKey][displayKey] === undefined) {
       return { matchingUrl: possibleKey, zoomLevel: -1 }
     }
 
-    const zoomLevel: number = result[profileKey][storageKey];
+    const zoomLevel: number = result[possibleKey][profileKey][displayKey];
     const zoomie: Zoomie = {
       zoomLevel: zoomLevel,
       matchingUrl: possibleKey,
