@@ -4,16 +4,29 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./popup.css" />
+    <!--<link rel="stylesheet" href="./popup.css" />-->
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="./materialize.min.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="./popup.css"  media="screen,projection"/>
   </head>
   <body>
-    <h1>Zoomies</h1>
-    <h2>Current Profile: </h2>
-    <!-- using <p .../> causes rest of to not render.-->
-    <p id="current_profile"></p>
-    <button id="save_btn">Save</button>
-    <button id="sync_zoom_btn">Zoom Sync</button>
-    <button id="load_btn">Load</button>
+    <div id="main">
+      <div id="title" class="mainChild">
+        <h1>Zoomies</h1>
+      </div>
+      <div id="profile" class="mainChild">
+        <h2>Current Profile: </h2>
+        <!-- using <p .../> causes rest of to not render.-->
+        <p id="current_profile"></p>
+      </div>
+      <div id="buttons" class="mainChild">
+        <button id="save_btn">Save</button>
+        <button id="sync_zoom_btn">Zoom Sync</button>
+        <button id="load_btn">Load</button>
+      </div>
+    </div>
     <script src="./popup.js" type="module"></script>
   </body>
 </html>
