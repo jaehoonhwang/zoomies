@@ -1,4 +1,8 @@
-import { ZoomieLocalStorage, ZoomieStorage, ZoomieStorageRequest } from "../storage";
+import {
+  ZoomieLocalStorage,
+  ZoomieStorage,
+  ZoomieStorageRequest,
+} from "../storage";
 import { ZoomieConfig } from "../config";
 
 function queryAllTabs(): Promise<chrome.tabs.Tab[]> {
@@ -12,7 +16,6 @@ async function main() {
   const profile = document.querySelector("#current_profile");
   if (profile !== null) {
     profile.textContent = config.currentProfile.name;
-    // profile.nodeValue = config.currentProfile.name;
   }
 
   const saveClickCallback = () => {
@@ -29,7 +32,7 @@ async function main() {
                   width: displayInfo.width,
                   height: displayInfo.height,
                   windowType: displayInfo.type,
-                }
+                },
               };
               storage.upsave(request);
             });
@@ -37,7 +40,7 @@ async function main() {
         }
       }
     });
-  }
+  };
 
   const loadClickCallback = () => {
     queryAllTabs().then(async (tabs) => {
@@ -53,14 +56,14 @@ async function main() {
                   width: displayInfo.width,
                   height: displayInfo.height,
                   windowType: displayInfo.type,
-                }
+                },
               };
               storage.load(request);
             });
           });
         }
       }
-    })
+    });
   };
 
   const syncClickCallback = () => {
@@ -77,7 +80,7 @@ async function main() {
                   width: displayInfo.width,
                   height: displayInfo.height,
                   windowType: displayInfo.type,
-                }
+                },
               };
               storage.load(request);
             });
@@ -87,19 +90,18 @@ async function main() {
     });
   };
 
-  const saveButton = document.getElementById('save_btn');
+  const saveButton = document.getElementById("save_btn");
   if (saveButton !== null) {
-    saveButton.addEventListener('click', saveClickCallback);
+    saveButton.addEventListener("click", saveClickCallback);
   }
-  const loadButton = document.getElementById('load_btn');
+  const loadButton = document.getElementById("load_btn");
   if (loadButton !== null) {
-    loadButton.addEventListener('click', loadClickCallback);
+    loadButton.addEventListener("click", loadClickCallback);
   }
-  const syncButton = document.getElementById('sync_btn');
+  const syncButton = document.getElementById("sync_btn");
   if (syncButton !== null) {
-    syncButton.addEventListener('click', syncClickCallback);
+    syncButton.addEventListener("click", syncClickCallback);
   }
-
 }
 
 main();

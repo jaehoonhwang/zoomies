@@ -6,25 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--<link rel="stylesheet" href="./popup.css" />-->
     <!--Import Google Icon Font-->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
     <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="./materialize.min.css"  media="screen,projection"/>
-    <link type="text/css" rel="stylesheet" href="./popup.css"  media="screen,projection"/>
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="./materialize.min.css"
+      media="screen,projection"
+    />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="./popup.css"
+      media="screen,projection"
+    />
   </head>
   <body>
     <div id="main">
-      <div id="title" class="mainChild">
-        <h1>Zoomies</h1>
+      <div id="title" class="mainChild orange darken-1">
+        <h2 id="titleText">Zoomies</h2>
       </div>
       <div id="profile" class="mainChild">
-        <h2>Current Profile: </h2>
+        <h5>Current:</h5>
         <!-- using <p .../> causes rest of to not render.-->
-        <p id="current_profile"></p>
+        <h5 id="current_profile"></h5>
       </div>
-      <div id="buttons" class="mainChild">
-        <button id="save_btn">Save</button>
-        <button id="sync_zoom_btn">Zoom Sync</button>
-        <button id="load_btn">Load</button>
+      <div id="saveLoad" class="mainChild">
+        <button
+          class="waves-effect waves btn amber darken-2 black-text"
+          id="save_btn"
+        >
+          Save
+        </button>
+        <button
+          class="waves-effect waves btn amber darken-2 black-text"
+          id="load_btn"
+        >
+          Load
+        </button>
+      </div>
+      <div id="sync" class="mainChild">
+        <button
+          class="waves-effect waves btn amber darken-2 black-text"
+          id="sync_zoom_btn"
+        >
+          Zoom Sync
+        </button>
       </div>
     </div>
     <script src="./popup.js" type="module"></script>
