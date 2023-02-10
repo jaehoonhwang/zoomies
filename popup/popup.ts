@@ -4,6 +4,7 @@ import {
   ZoomieStorageRequest,
 } from "../storage";
 import { ZoomieConfig } from "../config";
+import { AutoInit, FormSelect } from "materialize-css";
 
 function queryAllTabs(): Promise<chrome.tabs.Tab[]> {
   return chrome.tabs.query({});
@@ -12,10 +13,38 @@ function queryAllTabs(): Promise<chrome.tabs.Tab[]> {
 async function main() {
   const storage: ZoomieStorage = new ZoomieLocalStorage();
   const config: ZoomieConfig = await storage.configLoad();
+  AutoInit();
 
   const profile = document.querySelector("#current_profile");
   if (profile !== null) {
     profile.textContent = config.currentProfile.name;
+  }
+
+  const profileSelect = document.querySelector('#profileSelections');
+  if (profileSelect !== null) {
+    let unseen = config.profiles.map(p => p.name);
+    console.log(unseen);
+    const defaultProfileName = config.currentProfile.name;
+
+    const defaultSelect = document.createElement("option");
+    defaultSelect.setAttribute("value", "");
+    defaultSelect.setAttribute("class", "selected");
+    defaultSelect.textContent = defaultProfileName;
+    profileSelect.appendChild(defaultSelect);
+
+    unseen = unseen.filter(a => a != defaultProfileName);
+    console.log(unseen);
+    let value = 1;
+    for (const name of unseen) {
+      const selectChild = document.createElement("option");
+      selectChild.textContent = name;
+      selectChild.setAttribute("value", String(value));
+      profileSelect.appendChild(selectChild);
+      value += 1;
+    }
+
+    const elems = document.querySelectorAll('#profileSelections');
+    FormSelect.init(elems, {});
   }
 
   const saveClickCallback = () => {

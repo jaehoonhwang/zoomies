@@ -34,15 +34,22 @@
         <!-- using <p .../> causes rest of to not render.-->
         <h5 id="current_profile"></h5>
       </div>
+      <div id="profileSelect" class="mainChild">
+        <div class="input-field col s12">
+          <select id="profileSelections">
+          </select>
+          <label>Zoomie Profiles</label>
+        </div>
+      </div>
       <div id="saveLoad" class="mainChild">
         <button
-          class="waves-effect waves btn amber darken-2 black-text"
+          class="waves-effect waves-light btn amber darken-2 black-text"
           id="save_btn"
         >
           Save
         </button>
         <button
-          class="waves-effect waves btn amber darken-2 black-text"
+          class="waves-effect waves-light btn amber darken-2 black-text"
           id="load_btn"
         >
           Load
@@ -50,7 +57,7 @@
       </div>
       <div id="sync" class="mainChild">
         <button
-          class="waves-effect waves btn amber darken-2 black-text"
+          class="waves-effect waves-light btn amber darken-2 black-text"
           id="sync_zoom_btn"
         >
           Zoom Sync

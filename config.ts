@@ -57,7 +57,13 @@ export const defaultProfile: ZoomieProfile = {
   displaySize: undefined,
 }
 
+export const defaultProfile2: ZoomieProfile = {
+  name: "BeautifulAlpaca",
+  description: "Default one created when installed",
+  displaySize: undefined,
+}
+
 export const defaultConfig: ZoomieConfig = {
   currentProfile: defaultProfile,
-  profiles: [defaultProfile],
+  profiles: [defaultProfile, defaultProfile2],
 };
