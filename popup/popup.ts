@@ -3,27 +3,40 @@ import {
   ZoomieStorage,
   ZoomieStorageRequest,
 } from "../storage";
-import { ZoomieConfig } from "../config";
+import { ZoomieConfig, CONFIG } from "../config";
 import { AutoInit, FormSelect } from "materialize-css";
 
 function queryAllTabs(): Promise<chrome.tabs.Tab[]> {
   return chrome.tabs.query({});
 }
 
+async function updateCurrentProfile(profileName: string) {
+  const profile = document.querySelector("#current_profile");
+  if (profile !== null) {
+    profile.textContent = profileName;
+  }
+}
+
+chrome.storage.onChanged.addListener(async function(changes, namespace) {
+  if (CONFIG in changes) {
+    const storage: ZoomieStorage = new ZoomieLocalStorage();
+    const config: ZoomieConfig = await storage.configLoad();
+    updateCurrentProfile(config.currentProfile.name);
+  }
+});
+
 async function main() {
   const storage: ZoomieStorage = new ZoomieLocalStorage();
   const config: ZoomieConfig = await storage.configLoad();
   AutoInit();
 
-  const profile = document.querySelector("#current_profile");
-  if (profile !== null) {
-    profile.textContent = config.currentProfile.name;
-  }
+  updateCurrentProfile(config.currentProfile.name);
+
 
   const profileSelect = document.querySelector('#profileSelections');
   if (profileSelect !== null) {
     let unseen = config.profiles.map(p => p.name);
-    console.log(unseen);
+    const selectElements: Array<Element> = [];
     const defaultProfileName = config.currentProfile.name;
 
     const defaultSelect = document.createElement("option");
@@ -31,17 +44,34 @@ async function main() {
     defaultSelect.setAttribute("class", "selected");
     defaultSelect.textContent = defaultProfileName;
     profileSelect.appendChild(defaultSelect);
+    selectElements.push(defaultSelect);
 
     unseen = unseen.filter(a => a != defaultProfileName);
-    console.log(unseen);
     let value = 1;
     for (const name of unseen) {
       const selectChild = document.createElement("option");
       selectChild.textContent = name;
       selectChild.setAttribute("value", String(value));
       profileSelect.appendChild(selectChild);
+      selectElements.push(selectChild);
       value += 1;
     }
+
+    profileSelect.addEventListener("change", (event) => {
+      console.log("IM BEING CALLED FROM ONCHANGE event", event);
+      if (event.target === null || !("value" in event.target)) {
+        console.log("Exiting");
+        return;
+      }
+      const selectedProfile = Number(event.target.value);
+      const result = config.profiles[selectedProfile];
+      if (result !== undefined) {
+        config.currentProfile = result;
+        storage.configUpsave(config);
+        updateCurrentProfile(result.name);
+      }
+
+    });
 
     const elems = document.querySelectorAll('#profileSelections');
     FormSelect.init(elems, {});
