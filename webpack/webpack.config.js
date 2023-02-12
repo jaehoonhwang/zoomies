@@ -9,6 +9,7 @@ module.exports = {
     content: path.resolve(__dirname, "..", "scripts/content.ts"),
     storage: path.resolve(__dirname, "..", "storage.ts"),
     config: path.resolve(__dirname, "..", "config.ts"),
+    options: path.resolve(__dirname, "..", "options/options.ts"),
   },
   output: {
     path: path.join(__dirname, "../dist"),
@@ -43,6 +44,17 @@ module.exports = {
     new CopyPlugin({
       patterns: [{
         from: ".", to: ".", context: "popup",
+        globOptions: {
+          ignore: [ // Ignore all `ts/js` files
+            "**/*.ts",
+            "**/*.js",
+          ],
+        },
+      }]
+    }),
+    new CopyPlugin({
+      patterns: [{
+        from: ".", to: ".", context: "options",
         globOptions: {
           ignore: [ // Ignore all `ts/js` files
             "**/*.ts",

@@ -40,6 +40,7 @@ export interface ZoomieStorageRequest {
  */
 export interface ZoomieStorage {
   storage: chrome.storage.StorageArea;
+  settingStorage: chrome.storage.StorageArea;
 
   upsave: (request: ZoomieStorageRequest) => Promise<void>;
   load: (request: ZoomieStorageRequest) => Promise<Zoomie>;
@@ -74,9 +75,11 @@ export class ZoomieConverter {
 
 export class ZoomieLocalStorage implements ZoomieStorage {
   storage: chrome.storage.LocalStorageArea;
+  settingStorage: chrome.storage.SyncStorageArea;
 
   public constructor() {
     this.storage = chrome.storage.local;
+    this.settingStorage = chrome.storage.sync;
   }
 
   public async upsave(request: ZoomieStorageRequest): Promise<void> {
@@ -122,7 +125,7 @@ export class ZoomieLocalStorage implements ZoomieStorage {
   }
 
   public async configLoad(): Promise<ZoomieConfig> {
-    const result = await this.storage.get([CONFIG]);
+    const result = await this.settingStorage.get([CONFIG]);
     return result[CONFIG];
   }
 
@@ -132,6 +135,6 @@ export class ZoomieLocalStorage implements ZoomieStorage {
       config = newConfig;
     }
 
-    this.storage.set({ [CONFIG]: config });
+    this.settingStorage.set({ [CONFIG]: config });
   }
 }
