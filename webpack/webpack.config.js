@@ -42,6 +42,9 @@ module.exports = {
       patterns: [{ from: ".", to: ".", context: "public" }]
     }),
     new CopyPlugin({
+      patterns: [{ from: ".", to: ".", context: "materialize" }]
+    }),
+    new CopyPlugin({
       patterns: [{
         from: ".", to: ".", context: "popup",
         globOptions: {
