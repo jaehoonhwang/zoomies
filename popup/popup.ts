@@ -131,6 +131,16 @@ async function main() {
   if (syncButton !== null) {
     syncButton.addEventListener("click", syncClickCallback);
   }
+  const settingButton = document.getElementById("setting_btn");
+  if (settingButton !== null) {
+    settingButton.addEventListener("click", () => {
+      if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+      } else {
+        window.open(chrome.runtime.getURL('options.html'));
+      }
+    });
+  }
 }
 
 main();
