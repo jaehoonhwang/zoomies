@@ -58,9 +58,7 @@ async function main() {
     }
 
     profileSelect.addEventListener("change", (event) => {
-      console.log("IM BEING CALLED FROM ONCHANGE event", event);
       if (event.target === null || !("value" in event.target)) {
-        console.log("Exiting");
         return;
       }
       const selectedProfile = Number(event.target.value);

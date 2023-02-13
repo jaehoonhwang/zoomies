@@ -10,6 +10,7 @@ module.exports = {
     storage: path.resolve(__dirname, "..", "storage.ts"),
     config: path.resolve(__dirname, "..", "config.ts"),
     options: path.resolve(__dirname, "..", "options/options.ts"),
+    tabs: path.resolve(__dirname, "..", "tabs.ts"),
   },
   output: {
     path: path.join(__dirname, "../dist"),

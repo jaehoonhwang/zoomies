@@ -9,6 +9,8 @@ import { ZoomieConfig, CONFIG } from './config';
  * This took me for a while to get it right. smh
  */
 
+const UNDEFINED_ZOOM_LEVEL = -1;
+
 export interface Zoomie {
   zoomLevel: number;
   matchingUrl: string;
@@ -25,6 +27,31 @@ export interface ZoomieStorageRequest {
   zoomLevel: number;
   rawUrl: string;
   profileName: string;
+}
+
+export function buildStorageRequest(
+  window: chrome.windows.Window,
+  profileName: string,
+  tab: chrome.tabs.Tab,
+  zoomLevel: number): ZoomieStorageRequest {
+
+  return {
+    zoomLevel: zoomLevel,
+    profileName: profileName,
+    display: {
+      width: window.width,
+      height: window.height,
+    },
+    rawUrl: tab.url!,
+  }
+}
+
+export function buildStorageRequestWithNoZoom(
+  window: chrome.windows.Window,
+  profileName: string,
+  tab: chrome.tabs.Tab,
+): ZoomieStorageRequest {
+  return buildStorageRequest(window, profileName, tab, UNDEFINED_ZOOM_LEVEL);
 }
 
 /**
