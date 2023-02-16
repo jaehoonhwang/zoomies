@@ -1,11 +1,11 @@
-import { ZoomieConfig, CONFIG } from './config';
+import { ZoomieConfig, CONFIG } from "./config";
 
 /**
  * PSA: Chrome local storage is really weird.
  * When you store { "a": "b" }, you do storage.set({"a": "b"})
  * but when you retrieve you have to unpack it AGAIN.
- * storage.get(["a"]).then((item) => console.log("Key: " + item["a"])) 
- * Following will return B. 
+ * storage.get(["a"]).then((item) => console.log("Key: " + item["a"]))
+ * Following will return B.
  * This took me for a while to get it right. smh
  */
 
@@ -33,8 +33,8 @@ export function buildStorageRequest(
   window: chrome.windows.Window,
   profileName: string,
   tab: chrome.tabs.Tab,
-  zoomLevel: number): ZoomieStorageRequest {
-
+  zoomLevel: number
+): ZoomieStorageRequest {
   return {
     zoomLevel: zoomLevel,
     profileName: profileName,
@@ -43,13 +43,13 @@ export function buildStorageRequest(
       height: window.height,
     },
     rawUrl: tab.url!,
-  }
+  };
 }
 
 export function buildStorageRequestWithNoZoom(
   window: chrome.windows.Window,
   profileName: string,
-  tab: chrome.tabs.Tab,
+  tab: chrome.tabs.Tab
 ): ZoomieStorageRequest {
   return buildStorageRequest(window, profileName, tab, UNDEFINED_ZOOM_LEVEL);
 }
@@ -91,9 +91,10 @@ export class ZoomieConverter {
     if (display.height === undefined || display.width === undefined) {
       return "";
     }
-    const displayKey: string = display.height + this.displayDelimiter + display.width;
+    const displayKey: string =
+      display.height + this.displayDelimiter + display.width;
     if (display.windowType === undefined) {
-      return displayKey
+      return displayKey;
     }
 
     return displayKey + this.displayTypeDelimieter + display.windowType;
@@ -115,7 +116,6 @@ export class ZoomieLocalStorage implements ZoomieStorage {
     const profileKey: string = request.profileName;
 
     this.storage.get([possibleKey], (zoomies) => {
-
       if (zoomies[possibleKey] === undefined) {
         zoomies[possibleKey] = {};
       }
@@ -136,10 +136,12 @@ export class ZoomieLocalStorage implements ZoomieStorage {
 
     const result = await this.storage.get([possibleKey]);
 
-    if (result[possibleKey] === undefined ||
+    if (
+      result[possibleKey] === undefined ||
       result[possibleKey][profileKey] === undefined ||
-      result[possibleKey][profileKey][displayKey] === undefined) {
-      return { matchingUrl: possibleKey, zoomLevel: -1 }
+      result[possibleKey][profileKey][displayKey] === undefined
+    ) {
+      return { matchingUrl: possibleKey, zoomLevel: -1 };
     }
 
     const zoomLevel: number = result[possibleKey][profileKey][displayKey];
@@ -158,7 +160,7 @@ export class ZoomieLocalStorage implements ZoomieStorage {
 
   public async configUpsave(newConfig: ZoomieConfig): Promise<void> {
     let config: ZoomieConfig = await this.configLoad();
-    if (config === undefined) {
+    if (config !== undefined) {
       config = newConfig;
     }
 

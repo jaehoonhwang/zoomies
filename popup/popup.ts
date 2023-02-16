@@ -17,7 +17,7 @@ async function updateCurrentProfile(profileName: string) {
   }
 }
 
-chrome.storage.onChanged.addListener(async function(changes, namespace) {
+chrome.storage.onChanged.addListener(async function (changes, namespace) {
   if (CONFIG in changes) {
     const storage: ZoomieStorage = new ZoomieLocalStorage();
     const config: ZoomieConfig = await storage.configLoad();
@@ -32,10 +32,9 @@ async function main() {
 
   updateCurrentProfile(config.currentProfile.name);
 
-
-  const profileSelect = document.querySelector('#profileSelections');
+  const profileSelect = document.querySelector("#profileSelections");
   if (profileSelect !== null) {
-    let unseen = config.profiles.map(p => p.name);
+    let unseen = config.profiles.map((p) => p.name);
     const selectElements: Array<Element> = [];
     const defaultProfileName = config.currentProfile.name;
 
@@ -46,7 +45,7 @@ async function main() {
     profileSelect.appendChild(defaultSelect);
     selectElements.push(defaultSelect);
 
-    unseen = unseen.filter(a => a != defaultProfileName);
+    unseen = unseen.filter((a) => a != defaultProfileName);
     let value = 1;
     for (const name of unseen) {
       const selectChild = document.createElement("option");
@@ -68,10 +67,11 @@ async function main() {
         storage.configUpsave(config);
         updateCurrentProfile(result.name);
       }
-
+      const elems = document.querySelectorAll("#profileSelections");
+      FormSelect.init(elems, {});
     });
 
-    const elems = document.querySelectorAll('#profileSelections');
+    const elems = document.querySelectorAll("#profileSelections");
     FormSelect.init(elems, {});
   }
 
@@ -79,7 +79,7 @@ async function main() {
     queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url != undefined) {
-          chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
+          chrome.tabs.getZoom(tab.id, function (zoomFactor: number) {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
@@ -103,7 +103,7 @@ async function main() {
     queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url !== undefined) {
-          chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
+          chrome.tabs.getZoom(tab.id, function (zoomFactor: number) {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
@@ -127,7 +127,7 @@ async function main() {
     queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url !== undefined) {
-          chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
+          chrome.tabs.getZoom(tab.id, function (zoomFactor: number) {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
@@ -165,7 +165,7 @@ async function main() {
       if (chrome.runtime.openOptionsPage) {
         chrome.runtime.openOptionsPage();
       } else {
-        window.open(chrome.runtime.getURL('options.html'));
+        window.open(chrome.runtime.getURL("options.html"));
       }
     });
   }
