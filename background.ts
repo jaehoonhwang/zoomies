@@ -1,5 +1,7 @@
-import { buildStorageRequestWithNoZoom, ZoomieLocalStorage, 
-  ZoomieStorage, ZoomieStorageRequest } from './storage';
+import {
+  buildStorageRequestWithNoZoom, ZoomieLocalStorage,
+  ZoomieStorage, ZoomieStorageRequest
+} from './storage';
 import { defaultConfig } from './config';
 
 chrome.runtime.onInstalled.addListener(function() {
@@ -15,9 +17,6 @@ chrome.tabs.onZoomChange.addListener(
     const config = await storage.configLoad();
     const tab = await chrome.tabs.get(tabId);
 
-    if (tab === undefined) {
-      return;
-    }
     const window = await chrome.windows.get(tab.windowId);
 
     const request: ZoomieStorageRequest = {
@@ -44,7 +43,7 @@ chrome.windows.onBoundsChanged.addListener(
       if (tab.id && tab.url != undefined) {
         chrome.windows.get(tab.windowId, async function(window) {
           const request: ZoomieStorageRequest = buildStorageRequestWithNoZoom(
-          window, config.currentProfile.name, tab);
+            window, config.currentProfile.name, tab);
           const zoomie = await storage.load(request);
           chrome.tabs.setZoom(tab.id!, zoomie.zoomLevel);
         });
