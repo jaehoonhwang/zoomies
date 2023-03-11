@@ -1,6 +1,8 @@
 import { ZoomieLocalStorage, ZoomieStorage } from "../storage";
+import { AutoInit, FormSelect } from "materialize-css";
 
 async function main() {
+  AutoInit();
   const storage = new ZoomieLocalStorage();
   const config = await storage.configLoad();
 

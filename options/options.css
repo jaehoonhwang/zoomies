@@ -18,3 +18,7 @@ div.mainChild {
   justify-content: space-evenly;
   padding: 1em;
 }
+
+div.profile-form {
+  padding: 5em;
+}

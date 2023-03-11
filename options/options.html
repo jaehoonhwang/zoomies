@@ -30,9 +30,35 @@
         <h2 id="titleText">Zoomies</h2>
       </div>
       <div id="profile" class="mainChild">
-        <h5>Current:</h5>
+        <h5>Current Profile:</h5>
         <!-- using <p .../> causes rest of to not render.-->
         <h5 id="current_profile"></h5>
+      </div>
+      <div id="profile" class="mainChild">
+        <h5>Default Profile:</h5>
+        <!-- using <p .../> causes rest of to not render.-->
+        <h5 id="default_profile"></h5>
+      </div>
+      <div class="profile-form">
+        <form class="col s12">
+            <div class="row">
+              <div class="input-field col s6">
+                <input placeholder="Placeholder" id="select_profile_name" type="text" class="validate">
+                <label for="select_profile_name">Profile Name</label>
+              </div>
+              <div class="input-field col s6">
+                <input id="profile_display_size" type="text" class="validate">
+                <label for="profile_display_size">Display Size</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <textarea id="profile_description" class="materialize-textarea"></textarea>
+                <label for="profile_description">Profile Description</label>
+              </div>
+            </div>
+          <button id="form-submit">Submit</button>
+        </form>
       </div>
     </div>
     <script src="./options.js" type="module"></script>
