@@ -11,6 +11,7 @@ module.exports = {
     config: path.resolve(__dirname, "..", "config.ts"),
     options: path.resolve(__dirname, "..", "options/options.ts"),
     tabs: path.resolve(__dirname, "..", "tabs.ts"),
+    custom: path.resolve(__dirname, "..", "custom/custom.ts"),
   },
   output: {
     path: path.join(__dirname, "../dist"),

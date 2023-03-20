@@ -159,11 +159,10 @@ export class ZoomieLocalStorage implements ZoomieStorage {
   }
 
   public async configUpsave(newConfig: ZoomieConfig): Promise<void> {
-    let config: ZoomieConfig = await this.configLoad();
-    if (config !== undefined) {
-      config = newConfig;
+    if (newConfig == undefined) {
+      newConfig = await this.configLoad();
     }
 
-    this.settingStorage.set({ [CONFIG]: config });
+    this.settingStorage.set({ [CONFIG]: newConfig });
   }
 }

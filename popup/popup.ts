@@ -3,25 +3,23 @@ import {
   ZoomieStorage,
   ZoomieStorageRequest,
 } from "../storage";
-import { ZoomieConfig, CONFIG } from "../config";
+import { updateCurrentProfile, updateProfileSelect } from "../custom/custom";
 import { AutoInit, FormSelect } from "materialize-css";
+import { ZoomieConfig, CONFIG } from "../config";
+
+const profileSelectName = "#profileSelections";
+const currentProfileName = "#current_profile";
+const saveElementIDName = "#save_btn";
 
 function queryAllTabs(): Promise<chrome.tabs.Tab[]> {
   return chrome.tabs.query({});
 }
 
-async function updateCurrentProfile(profileName: string) {
-  const profile = document.querySelector("#current_profile");
-  if (profile !== null) {
-    profile.textContent = profileName;
-  }
-}
-
-chrome.storage.onChanged.addListener(async function (changes, namespace) {
+chrome.storage.onChanged.addListener(async function(changes, namespace) {
   if (CONFIG in changes) {
     const storage: ZoomieStorage = new ZoomieLocalStorage();
     const config: ZoomieConfig = await storage.configLoad();
-    updateCurrentProfile(config.currentProfile.name);
+    updateCurrentProfile(currentProfileName, config.currentProfile.name);
   }
 });
 
@@ -30,56 +28,15 @@ async function main() {
   const config: ZoomieConfig = await storage.configLoad();
   AutoInit();
 
-  updateCurrentProfile(config.currentProfile.name);
+  updateCurrentProfile(currentProfileName, config.currentProfile.name);
+  updateProfileSelect(profileSelectName, currentProfileName);
 
-  const profileSelect = document.querySelector("#profileSelections");
-  if (profileSelect !== null) {
-    let unseen = config.profiles.map((p) => p.name);
-    const selectElements: Array<Element> = [];
-    const defaultProfileName = config.currentProfile.name;
-
-    const defaultSelect = document.createElement("option");
-    defaultSelect.setAttribute("value", "");
-    defaultSelect.setAttribute("class", "selected");
-    defaultSelect.textContent = defaultProfileName;
-    profileSelect.appendChild(defaultSelect);
-    selectElements.push(defaultSelect);
-
-    unseen = unseen.filter((a) => a != defaultProfileName);
-    let value = 1;
-    for (const name of unseen) {
-      const selectChild = document.createElement("option");
-      selectChild.textContent = name;
-      selectChild.setAttribute("value", String(value));
-      profileSelect.appendChild(selectChild);
-      selectElements.push(selectChild);
-      value += 1;
-    }
-
-    profileSelect.addEventListener("change", (event) => {
-      if (event.target === null || !("value" in event.target)) {
-        return;
-      }
-      const selectedProfile = Number(event.target.value);
-      const result = config.profiles[selectedProfile];
-      if (result !== undefined) {
-        config.currentProfile = result;
-        storage.configUpsave(config);
-        updateCurrentProfile(result.name);
-      }
-      const elems = document.querySelectorAll("#profileSelections");
-      FormSelect.init(elems, {});
-    });
-
-    const elems = document.querySelectorAll("#profileSelections");
-    FormSelect.init(elems, {});
-  }
 
   const saveClickCallback = () => {
     queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url != undefined) {
-          chrome.tabs.getZoom(tab.id, function (zoomFactor: number) {
+          chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
@@ -103,7 +60,7 @@ async function main() {
     queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url !== undefined) {
-          chrome.tabs.getZoom(tab.id, function (zoomFactor: number) {
+          chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
@@ -127,7 +84,7 @@ async function main() {
     queryAllTabs().then(async (tabs) => {
       for (const tab of tabs) {
         if (tab.id && tab.url !== undefined) {
-          chrome.tabs.getZoom(tab.id, function (zoomFactor: number) {
+          chrome.tabs.getZoom(tab.id, function(zoomFactor: number) {
             chrome.windows.get(tab.windowId, (displayInfo) => {
               const request: ZoomieStorageRequest = {
                 zoomLevel: zoomFactor,
